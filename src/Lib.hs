@@ -32,7 +32,7 @@ topN :: Int
 topN = 3
 
 
--- | The IO part of the program : import data, parse it, process it, display results
+-- | The IO part of the program : read data, parse it, process it, display results
 processDataset :: Int -> IO ()
 processDataset topn = do
   fcontents <- B.readFile filePath
