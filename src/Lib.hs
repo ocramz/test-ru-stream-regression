@@ -20,7 +20,7 @@ import Data.Either
 
 -- | Dataset
 filePath :: String
-filePath = "data/artist_data-short.csv"
+filePath = "data/artist_data.csv"
 
 -- | Data type
 data Row = Row { artistName :: String,
@@ -67,7 +67,7 @@ a <.> b = sum (V.zipWith (*) a b)
 
 
 
--- | Near-zero test, depending on numerical precision
+-- | Near-zero test that depends on the numerical precision used
 
 class Num e => Epsilon e where
   nearZero :: e -> Bool
@@ -92,10 +92,12 @@ parseRows = V.fromList <$> P.sepBy parseRow P.endOfLine <* P.endOfInput
 
 parseRow :: Parser B.ByteString Row
 parseRow = do
-  n <- P.many' (P.letter_ascii <|> P.space)  <* spacer
+  n <- P.many' (P.letter_ascii <|> P.space <|> mod1 <|> mod2)  <* spacer
   d <- P.sepBy P.decimal spacer
   return $ Row n (V.fromList d) where
     spacer = P.char ';'
+    mod1 = P.char '\''  -- corner cases
+    mod2 = P.char '-'
 
     
 
@@ -104,9 +106,7 @@ parseRow = do
 
 parseTest = P.parseOnly parseRows
 
-t1, t2, t3, t0 :: B.ByteString
-
-t0 = "gino fizz"
+t1, t2, t3 :: B.ByteString
 
 t1 = "Menandez;5749;5782;5765;5703;5696;5730;5731;5658;5653;5622;5621;5711;5731;5562;5568;5590;5511;5452;5433;5436;5457;5191;5055;5085;5082;5452;5425;5414;5418;4876;4830;4830;4829;4829;4821;4904;4896;4892;4874;4886;4873;4869;4874;4547;4375;4461;4695;4660;4652;4651;4642;4626;5001;4998;5518;5510;5496;5494;5419;5419;5391;5212;5104;5088;5802;5885;5952;5972;5987;6072;6071;6070;6596;6594;6921;6943;6915;7011;7042;7167;7301;7291;7271;7312;7310;7224;7219;7219;7010;7030;7030;7031;7041;6925;6795;6800;6854;6787;6283;6522;6348;6316;6307;5990;5975;6354;6346;6346;6346;6528;6507;6816;7121;7121;7120;7112;7245;7243;7239;7353;7603;7599;7614;7598;7598;7595;7595;7558;7558;7734;7734;7577;7576;7386;7416;7407;7612;7619;7606;7600;7364;7393;6618;6617;6465;6446;6593;6604;6580;6578;6577;6084;5982;5991;5989;5909;5924;6176;6184;7205;7235;7291;7306;7159;7194;7160;7150;7188;7176;8086;7939;7931;8277;8618;8594;8583;8582;8314;8314;8312;8198;8183;8184" 
 
