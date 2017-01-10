@@ -6,7 +6,6 @@ import qualified Data.Vector as V
 import qualified Data.Vector.Algorithms.Merge as VA
 
 -- import System.IO
--- import Data.Text
 
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.ByteString as B
@@ -20,7 +19,7 @@ import Data.Char
 import Data.Either
 
 filePath :: String
-filePath = "data/artist_data.csv"
+filePath = "data/artist_data-short.csv"
 
 
 
@@ -33,6 +32,9 @@ parseDataset = do
   return $ P.parse parseRows fcontents
 
 
+parseRows :: Parser B.ByteString (V.Vector Row)
+parseRows = V.fromList <$> P.sepBy parseRow P.endOfLine <* P.endOfInput
+
 parseRow :: Parser B.ByteString Row
 parseRow = do
   n <- P.many' P.letter_ascii <* spacer
@@ -41,14 +43,8 @@ parseRow = do
     spacer = P.char ';'
 
 
--- parseRows = P.many' (parseRow <* P.endOfLine) <* P.endOfInput
 
-parseRows :: Parser B.ByteString (V.Vector Row)
-parseRows = V.fromList <$> P.sepBy parseRow P.endOfLine <* P.endOfInput
-
-
-
---
+-- testing testing
 
 parseTest = P.parseOnly parseRows t2
 

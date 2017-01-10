@@ -21,7 +21,6 @@ library
   exposed-modules:     Lib
   build-depends:       base >= 4.7 && < 5
                      , hspec >= 2.2.4
-                     , text
                      , bytestring
                      , attoparsec
                      , vector
@@ -34,7 +33,6 @@ executable test-ru-stream-regression
   main-is:             Main.hs
   build-depends:       base
                      , test-ru-stream-regression
-                     , text >= 1.2.2.1
 
 test-suite spec
   default-language:    Haskell2010
@@ -47,7 +45,6 @@ test-suite spec
                      , base
                      , hspec >= 2.2.4
                      , test-ru-stream-regression
-                     , text
 
 source-repository head
   type:     git
