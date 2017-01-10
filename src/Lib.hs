@@ -5,27 +5,22 @@ import Control.Applicative
 import qualified Data.Vector as V
 import qualified Data.Vector.Algorithms.Merge as VA
 
--- import System.IO
-
-import qualified Data.ByteString.Lazy as BL
+-- import qualified Data.ByteString.Lazy as BL
 import qualified Data.ByteString as B
 
 import Data.Attoparsec.Internal.Types (Parser)
-import qualified Data.Attoparsec.ByteString.Char8 as P (decimal, signed, scientific, digit, number, rational, anyChar, letter_ascii, char, char8, endOfLine, endOfInput, isDigit, isDigit_w8, isEndOfLine, isHorizontalSpace, parseOnly, space, count)
+import qualified Data.Attoparsec.ByteString.Char8 as P (decimal, letter_ascii, char, endOfLine, endOfInput, parseOnly, space, count)
 import qualified Data.Attoparsec.ByteString.Lazy as P
-
--- import Data.Char
--- import Data.Either
-
 
 
 
 
 -- * Business logic
 
--- | Length (days) of 1st observation period
-obsLen :: Int
+-- | Length (days) of observation periods
+obsLen, obsLen2 :: Int
 obsLen = 91
+obsLen2 = 92
 
 -- | Dataset file path
 filePath :: String
@@ -36,15 +31,18 @@ filePath = "data/artist_data-short.csv"
 
 parseDataset = do
   fcontents <- B.readFile filePath
-  return $ P.parseOnly parseRows fcontents
+  case P.parseOnly parseRows fcontents of Left e -> error e
+                                          Right x ->
+                                            return $ analyzeDataset x
       
 
 
 -- | Linear correlation in time
--- pearsonVsDays :: Floating a => V.Vector a -> a
-pearsonVsDays v = (`pearsonR` t_) . dailyStreams2 <$> v  where
-  t_ = fromIntegral <$> V.enumFromTo 1 (V.length d1)
-  (Row n d1 d2) = V.head v
+analyzeDataset v = analyze <$> v  where
+  t1_ = fi <$> V.enumFromTo 1 obsLen  -- time axis
+  t2_ = fi <$> V.enumFromTo 1 obsLen2
+  analyze (Row n d1 d2) = (n, pearsonR t1_ (fi <$> d1), pearsonR t2_ (fi <$> d2))
+  
 
 
 
@@ -106,7 +104,7 @@ data Row a = Row { artistName :: String,
 
 
 -- | Parser for a single row
-parseRow :: Parser B.ByteString (Row Integer)
+parseRow :: Parser B.ByteString (Row Int)
 parseRow = do
   n <- parseName <* spacer
   d1 <- P.count obsLen (P.decimal <* spacer)
@@ -120,7 +118,7 @@ parseRow = do
 
 
 -- -- | Parser for the whole file
-parseRows :: Parser B.ByteString (V.Vector (Row Integer))
+parseRows :: Parser B.ByteString (V.Vector (Row Int))
 parseRows = V.fromList <$> P.sepBy parseRow P.endOfLine <* P.endOfInput
 
 
@@ -129,6 +127,8 @@ parseRows = V.fromList <$> P.sepBy parseRow P.endOfLine <* P.endOfInput
 
 
 -- | Utilities
+
+fi = fromIntegral
 
 (<$$>) :: (Functor f1, Functor f) => (a -> b) -> f (f1 a) -> f (f1 b)
 (<$$>) = fmap . fmap
