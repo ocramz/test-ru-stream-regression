@@ -1,8 +1,14 @@
 module Main where
 
+import System.Environment
+
 import Lib 
 
-import Text.Printf (printf)
 
 main :: IO ()
-main = printf "2 + 3 = %d\n" (5 :: Int)
+main = do
+  -- argv@(n : _) <- getArgs
+  -- let n' = case length argv of 0 -> topN
+  --                              1 -> read n :: Int
+  --                              _ -> topN
+  processDataset topN -- n'

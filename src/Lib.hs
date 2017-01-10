@@ -27,10 +27,14 @@ obsLen2 = 92
 filePath :: String
 filePath = "data/artist_data.csv"
 
+-- | Size of rankings
+topN :: Int
+topN = 3
 
 
 
-processDataset = do
+
+processDataset topN = do
   fcontents <- B.readFile filePath
   case P.parseOnly parseRows fcontents of
     Left e -> error e
@@ -38,8 +42,8 @@ processDataset = do
      let dat = sortResults $ analyzeDataset x  -- NB: sorted in ascending order
          n = V.length dat
          c = correlatePeriods dat
-         rankLo = V.drop (n - 3) dat
-         rankHi = V.take 3 dat
+         rankLo = V.drop (n - topN) dat
+         rankHi = V.take topN dat
          rankings = rankHi V.++ rankLo
      displayResults rankings c
 
