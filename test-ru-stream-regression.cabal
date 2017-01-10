@@ -22,6 +22,7 @@ library
   build-depends:       base >= 4.7 && < 5
                      , cassava
                      , vector
+                     , vector-algorithms
 
 executable test-ru-stream-regression
   default-language:    Haskell2010
@@ -37,6 +38,7 @@ test-suite spec
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
+  other-modules:       LibSpec
   build-depends:       base
                      , test-ru-stream-regression
                      , hspec
