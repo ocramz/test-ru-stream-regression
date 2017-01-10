@@ -27,7 +27,7 @@ obsLen2 = 92
 filePath :: String
 filePath = "data/artist_data.csv"
 
--- | Size of rankings
+-- | Size of rankings (default, can be overridden from command line)
 topN :: Int
 topN = 3
 
