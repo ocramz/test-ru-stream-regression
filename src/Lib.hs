@@ -46,6 +46,7 @@ parseRow = do
 
 
 
+
 -- ** Numerics
 meanV :: Fractional a => V.Vector a -> a
 meanV v = V.sum v / fromIntegral (V.length v)
@@ -74,6 +75,20 @@ pearsonR x y = (xm <.> ym) / (sx * sy) where
   sx = sqrt (xm <.> xm)
   sy = sqrt (ym <.> ym)
 
+
+
+
+-- | Utilities
+
+nearOne x = nearZero (1 - x) 
+
+
+
+-- | Near zero test
+class Num e => Epsilon e where
+  nearZero :: e -> Bool
+
+instance Epsilon Double where nearZero x = x <= 1e-12
 
 
 
