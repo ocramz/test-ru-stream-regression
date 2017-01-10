@@ -1,5 +1,4 @@
 {-# language OverloadedStrings #-}
-
 module Lib where
 
 import qualified Data.Vector as V
@@ -18,11 +17,12 @@ import qualified Data.Attoparsec.ByteString.Lazy as P
 import Data.Char
 import Data.Either
 
+
+-- | Dataset
 filePath :: String
 filePath = "data/artist_data-short.csv"
 
-
-
+-- | Data type
 data Row = Row { artistName :: String,
                  dailyStreams :: V.Vector Int } deriving (Eq, Show)
 
@@ -32,6 +32,8 @@ parseDataset = do
   return $ P.parse parseRows fcontents
 
 
+
+-- ** Parsing-related
 parseRows :: Parser B.ByteString (V.Vector Row)
 parseRows = V.fromList <$> P.sepBy parseRow P.endOfLine <* P.endOfInput
 
@@ -41,6 +43,43 @@ parseRow = do
   d <- P.sepBy P.decimal spacer
   return $ Row n (V.fromList d) where
     spacer = P.char ';'
+
+
+
+-- ** Numerics
+meanV :: Fractional a => V.Vector a -> a
+meanV v = V.sum v / fromIntegral (V.length v)
+
+centerData :: Fractional b => V.Vector b -> V.Vector b
+centerData v = subtract (meanV v) <$> v
+
+varianceV :: Floating a => V.Vector a -> a
+varianceV v = meanV ((**2) <$> v) - (meanV v)**2
+
+stdDevV :: V.Vector Double -> Double
+stdDevV = sqrt . varianceV
+
+-- | Inner product
+(<.>) :: Num a => V.Vector a -> V.Vector a -> a
+a <.> b = sum (V.zipWith (*) a b)
+
+
+
+
+-- | Pearson linear correlation coefficient
+pearsonR :: Floating a => V.Vector a -> V.Vector a -> a
+pearsonR x y = (xm <.> ym) / (sx * sy) where
+  xm = centerData x
+  ym = centerData y
+  sx = sqrt (xm <.> xm)
+  sy = sqrt (ym <.> ym)
+
+
+
+
+
+
+
 
 
 
