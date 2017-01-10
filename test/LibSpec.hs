@@ -17,10 +17,8 @@ spec =
   describe "Lib" $ do
     -- it "works" $ 
     --   True `shouldBe` True
-    -- it "Pearson R of a vector with itself is ~ 1" $
-    --   nearOne (pearsonR v0 v0) `shouldBe` True
-    prop "Pearson R of a random vector with itself is ~ 1" $ \(x :: V.Vector Double) -> 
-      nearOne $ pearsonR x x
+    prop "Pearson R of a random vector with itself is ~ 1" $
+      \(x :: V.Vector Double) -> nearOne $ pearsonR x x
 
 
 
