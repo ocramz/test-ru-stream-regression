@@ -52,7 +52,9 @@ processDataset topn = do
 -- | Linear correlation in time of stream count for both observation periods
 analyzeDataset :: V.Vector (Row Int) -> V.Vector (String, Double, Double)
 analyzeDataset v = V.map analyze v  where
-  analyze (Row n d1 d2) = (n, pearsonR t1_ (fi <$> d1), pearsonR t2_ (fi <$> d2))
+  analyze row = (artistName row,
+                 pearsonR t1_ (fi <$> dailyStreams1 row),
+                 pearsonR t2_ (fi <$> dailyStreams2 row))
   t1_ = fi <$> V.enumFromTo 1 obsLen  -- time axis
   t2_ = fi <$> V.enumFromTo 1 obsLen2
   
