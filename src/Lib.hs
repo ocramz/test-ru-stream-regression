@@ -32,7 +32,7 @@ topN :: Int
 topN = 3
 
 
-
+-- | The IO part of the program : import data, parse it, process it, display results
 processDataset :: Int -> IO ()
 processDataset topn = do
   fcontents <- B.readFile filePath
@@ -48,6 +48,7 @@ processDataset topn = do
      putStrLn $ unwords ["Inter-period correlation :", show (correlatePeriods dat)]
 
 
+
 -- | Linear correlation in time of stream count for both observation periods
 analyzeDataset :: Functor f => f (Row Int) -> f (String, Double, Double)
 analyzeDataset v = analyze <$> v  where
@@ -55,7 +56,7 @@ analyzeDataset v = analyze <$> v  where
   t2_ = fi <$> V.enumFromTo 1 obsLen2
   analyze (Row n d1 d2) = (n, pearsonR t1_ (fi <$> d1), pearsonR t2_ (fi <$> d2))
   
--- | Sort rows according to time linear regression w.r.t. second period only
+-- | Sort rows in _descending_ order according to time linear regression w.r.t. second period only
 sortResults :: Ord a => V.Vector (t, t1, a) -> V.Vector (t, t1, a)
 sortResults v = V.modify (VA.sortBy fs) v where
   fs (_, _, c2a) (_, _, c2b) = compare (Down c2a) (Down c2b)   -- comparison function
