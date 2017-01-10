@@ -6,6 +6,7 @@ To build the binaries and run the tests:
 
     make all
 
-To run the application:
+To run the application and display the first 3 and last 3 results :
 
-    make run
+    stack exec ru-app -- 3
+
