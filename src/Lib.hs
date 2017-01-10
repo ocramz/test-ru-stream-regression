@@ -105,7 +105,7 @@ a <.> b = sum (V.zipWith (*) a b)
 class Num e => Epsilon e where
   nearZero :: e -> Bool
 
-instance Epsilon Double where nearZero x = x <= 1e-12
+instance Epsilon Double where nearZero x = abs x <= 1e-12
 
 nearOne :: Epsilon e => e -> Bool
 nearOne x = nearZero (1 - x) 
