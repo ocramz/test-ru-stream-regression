@@ -1,5 +1,6 @@
-main:
-	stack build && stack test
+all:
+	stack build
+	stack test
 
 run:
 	stack exec ru-app

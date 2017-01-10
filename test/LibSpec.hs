@@ -15,11 +15,11 @@ main = hspec spec
 spec :: Spec
 spec =
   describe "Lib" $ do
-    it "works" $ 
-      True `shouldBe` True
+    -- it "works" $ 
+    --   True `shouldBe` True
     -- it "Pearson R of a vector with itself is ~ 1" $
     --   nearOne (pearsonR v0 v0) `shouldBe` True
-    prop "Pearson R of a vector with itself is ~ 1" $ \(x :: V.Vector Double) -> 
+    prop "Pearson R of a random vector with itself is ~ 1" $ \(x :: V.Vector Double) -> 
       nearOne $ pearsonR x x
 
 
@@ -27,11 +27,11 @@ spec =
 -- | Arbitrary instances for QuickCheck
 
 instance Arbitrary (V.Vector Double) where
-  arbitrary = (V.fromList <$> vector 10) `suchThat` (\x -> V.sum x > 0)
+  arbitrary = (V.fromList <$> vector 10) `suchThat` (\x -> nonZero $ V.sum x)
 
 
 
 -- | test data
 
-v0 :: V.Vector Double
-v0 = V.fromList [1,2,3]
+-- v0 :: V.Vector Double
+-- v0 = V.fromList [1,2,3]

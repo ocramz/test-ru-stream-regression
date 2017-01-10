@@ -33,6 +33,25 @@ parseDataset = do
 
 
 
+
+
+
+
+
+-- | Pearson linear correlation coefficient
+pearsonR :: Floating a => V.Vector a -> V.Vector a -> a
+pearsonR x y = (xm <.> ym) / (sx * sy) where
+  xm = centerData x
+  ym = centerData y
+  sx = sqrt (xm <.> xm)
+  sy = sqrt (ym <.> ym)
+
+
+
+
+-- | Utilities
+
+
 -- ** Parsing-related
 parseRows :: Parser B.ByteString (V.Vector Row)
 parseRows = V.fromList <$> P.sepBy parseRow P.endOfLine <* P.endOfInput
@@ -67,24 +86,20 @@ a <.> b = sum (V.zipWith (*) a b)
 
 
 
--- | Pearson linear correlation coefficient
-pearsonR :: Floating a => V.Vector a -> V.Vector a -> a
-pearsonR x y = (xm <.> ym) / (sx * sy) where
-  xm = centerData x
-  ym = centerData y
-  sx = sqrt (xm <.> xm)
-  sy = sqrt (ym <.> ym)
 
 
 
-
--- | Utilities
-
-nearOne x = nearZero (1 - x) 
 
 
 
 -- | Near zero test
+
+nearOne :: Epsilon e => e -> Bool
+nearOne x = nearZero (1 - x) 
+
+nonZero :: Epsilon e => e -> Bool
+nonZero = not . nearZero
+
 class Num e => Epsilon e where
   nearZero :: e -> Bool
 
