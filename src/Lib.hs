@@ -50,18 +50,21 @@ processDataset topn = do
 
 
 -- | Linear correlation in time of stream count for both observation periods
-analyzeDataset :: Functor f => f (Row Int) -> f (String, Double, Double)
-analyzeDataset v = analyze <$> v  where
+analyzeDataset :: V.Vector (Row Int) -> V.Vector (String, Double, Double)
+analyzeDataset v = V.map analyze v  where
+  analyze (Row n d1 d2) = (n, pearsonR t1_ (fi <$> d1), pearsonR t2_ (fi <$> d2))
   t1_ = fi <$> V.enumFromTo 1 obsLen  -- time axis
   t2_ = fi <$> V.enumFromTo 1 obsLen2
-  analyze (Row n d1 d2) = (n, pearsonR t1_ (fi <$> d1), pearsonR t2_ (fi <$> d2))
   
--- | Sort rows in _descending_ order according to time linear regression w.r.t. second period only
+-- | Sort rows in _descending_ order according to time linear regression w.r.t.
+-- second period only
 sortResults :: Ord a => V.Vector (t, t1, a) -> V.Vector (t, t1, a)
 sortResults v = V.modify (VA.sortBy fs) v where
   fs (_, _, c2a) (_, _, c2b) = compare (Down c2a) (Down c2b)   -- comparison function
 
--- | Pearson correlation between the two vectors of linear trends, i.e. how well the artist trends for the first period correlates linearly with the artist trends for the second period
+-- | Pearson correlation between the two vectors of linear trends, i.e. how well the
+-- artist trends for the first period correlates linearly with the artist trends for
+-- the second period
 correlatePeriods :: Floating b => V.Vector (a, b, b) -> b
 correlatePeriods v = pearsonR c1_ c2_ where
            (_, c1_, c2_) = V.unzip3 v
@@ -138,7 +141,7 @@ parseRow = do
       cc2 = P.char '-'
 
 
--- -- | Parser for the whole file
+-- | Parser for the whole file
 parseRows :: Parser B.ByteString (V.Vector (Row Int))
 parseRows = V.fromList <$> P.sepBy parseRow P.endOfLine <* P.endOfInput
 
@@ -149,6 +152,7 @@ parseRows = V.fromList <$> P.sepBy parseRow P.endOfLine <* P.endOfInput
 
 -- | Utilities
 
+fi :: Int -> Double
 fi = fromIntegral
 
 (<$$>) :: (Functor f1, Functor f) => (a -> b) -> f (f1 a) -> f (f1 b)
@@ -159,11 +163,11 @@ fi = fromIntegral
 
 
 
--- -- test data
+-- | Test data
 
+parseTest :: B.ByteString -> Either String (Row Int)
 parseTest = P.parseOnly parseRow
 
 
 t1 :: B.ByteString
-
 t1 = "Shaana;4445;4425;4449;4335;4331;4315;4276;3825;3834;3960;3957;3543;3528;3616;3548;3559;3576;3519;3489;3488;3420;3337;3307;3288;3279;2711;3265;3260;3253;4617;4662;4662;4667;4654;4658;4844;4891;4887;4890;4895;4813;4799;4811;4965;5036;5062;5089;5094;5127;5127;5127;5184;4929;5060;5394;5391;5387;5379;5330;5330;5291;5412;5298;5282;4616;4630;4601;5078;5111;5061;5066;5066;5399;5398;5033;5049;5060;5418;5296;5201;5343;5338;5345;5378;5376;5519;5519;5518;5836;5615;5614;5614;5582;5601;5560;5552;5578;5624;5924;6035;5996;6006;6022;6299;6304;6391;6362;6376;6376;6301;6292;6304;6520;6518;6520;6533;6787;6780;6771;6843;7290;7284;7293;7256;7255;7247;7243;7194;7194;7086;7085;7217;7217;7230;7271;7220;7230;7320;7761;7742;7607;7579;7485;7480;7520;7531;7672;7654;7652;7652;7652;7571;7826;7796;7810;7923;7905;8140;8154;7825;7833;7830;7833;8005;8058;8118;8106;8075;8063;8254;8118;8092;8772;8711;8682;8702;8701;8285;8279;8279;8332;8351;8361"
