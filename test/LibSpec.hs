@@ -31,5 +31,5 @@ instance Arbitrary (V.Vector Double) where
 
 -- | test data
 
--- v0 :: V.Vector Double
--- v0 = V.fromList [1,2,3]
+v0 :: V.Vector Double
+v0 = V.fromList [1,2,3]
