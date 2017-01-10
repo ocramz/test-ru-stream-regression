@@ -68,8 +68,7 @@ sortResults v = V.modify (VA.sortBy fs) v where
 -- artist trends for the first period correlates linearly with the artist trends for
 -- the second period
 correlatePeriods :: Floating b => V.Vector (a, b, b) -> b
-correlatePeriods v = pearsonR c1_ c2_ where
-           (_, c1_, c2_) = V.unzip3 v
+correlatePeriods v = pearsonR c1_ c2_ where (_, c1_, c2_) = V.unzip3 v
 
   
 
