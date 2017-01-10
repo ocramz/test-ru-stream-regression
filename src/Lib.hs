@@ -41,8 +41,8 @@ processDataset topn = do
     Right x -> do
      let dat = sortResults $ analyzeDataset x  -- NB: sorted in descending order
          n = V.length dat
-         rankLo = V.drop (n - topn) dat
          rankHi = V.take topn dat
+         rankLo = V.drop (n - topn) dat
      putStrLn $ unwords ["Rankings (high):", show rankHi]
      putStrLn $ unwords ["Rankings (low):", show rankLo]  
      putStrLn $ unwords ["Inter-period correlation :", show (correlatePeriods dat)]
