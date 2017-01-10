@@ -12,6 +12,7 @@ import Data.Attoparsec.Internal.Types (Parser)
 import qualified Data.Attoparsec.ByteString.Char8 as P (decimal, letter_ascii, char, endOfLine, endOfInput, parseOnly, space, count)
 import qualified Data.Attoparsec.ByteString.Lazy as P
 
+import Data.Ord
 
 
 
@@ -24,29 +25,46 @@ obsLen2 = 92
 
 -- | Dataset file path
 filePath :: String
-filePath = "data/artist_data-short.csv"
+filePath = "data/artist_data.csv"
 
 
 
 
-parseDataset = do
+processDataset = do
   fcontents <- B.readFile filePath
-  case P.parseOnly parseRows fcontents of Left e -> error e
-                                          Right x ->
-                                            return $ sortResults $ analyzeDataset x
-      
+  case P.parseOnly parseRows fcontents of
+    Left e -> error e
+    Right x -> do
+     let dat = sortResults $ analyzeDataset x  -- NB: sorted in ascending order
+         n = V.length dat
+         c = correlatePeriods dat
+         rankLo = V.drop (n - 3) dat
+         rankHi = V.take 3 dat
+         rankings = rankHi V.++ rankLo
+     displayResults rankings c
+
+displayResults r c = do 
+  putStrLn $ unwords ["Rankings :", show r]
+  putStrLn $ unwords ["Inter-period correlation :", show c]
 
 
--- | Linear correlation in time
+-- | Linear correlation in time of stream count for both observation periods
+analyzeDataset :: Functor f => f (Row Int) -> f (String, Double, Double)
 analyzeDataset v = analyze <$> v  where
   t1_ = fi <$> V.enumFromTo 1 obsLen  -- time axis
   t2_ = fi <$> V.enumFromTo 1 obsLen2
   analyze (Row n d1 d2) = (n, pearsonR t1_ (fi <$> d1), pearsonR t2_ (fi <$> d2))
   
-
+-- | Sort rows according to time linear regression w.r.t. second period only
+sortResults :: Ord a => V.Vector (t, t1, a) -> V.Vector (t, t1, a)
 sortResults v = V.modify (VA.sortBy fs) v where
-  fs (n, _, c2a) (m, _, c2b) = compare c2a c2b   -- compare R of 2nd period 
+  fs (_, _, c2a) (_, _, c2b) = compare (Down c2a) (Down c2b)   -- comparison function
 
+-- | Pearson correlation between the two vectors of linear trends, i.e. how well the artist trends for the first period correlates linearly with the artist trends for the second period
+correlatePeriods :: Floating b => V.Vector (a, b, b) -> b
+correlatePeriods v = pearsonR c1_ c2_ where
+  (n_, c1_, c2_) = V.unzip3 v
+  
 
 
 
