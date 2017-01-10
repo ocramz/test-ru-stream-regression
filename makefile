@@ -3,4 +3,4 @@ all:
 	stack test
 
 run:
-	stack exec ru-app
+	stack exec ru-app -- 3

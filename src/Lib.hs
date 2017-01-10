@@ -34,21 +34,23 @@ topN = 3
 
 
 
-processDataset topN = do
+processDataset topn = do
   fcontents <- B.readFile filePath
   case P.parseOnly parseRows fcontents of
     Left e -> error e
     Right x -> do
-     let dat = sortResults $ analyzeDataset x  -- NB: sorted in ascending order
+     let dat = sortResults $ analyzeDataset x  -- NB: sorted in descending order
          n = V.length dat
-         c = correlatePeriods dat
-         rankLo = V.drop (n - topN) dat
-         rankHi = V.take topN dat
-         rankings = rankHi V.++ rankLo
-     displayResults rankings c
+         correlatePeriods :: Floating b => V.Vector (a, b, b) -> b
+         correlatePeriods v = pearsonR c1_ c2_ where
+           (_, c1_, c2_) = V.unzip3 v
+         rankLo = V.drop (n - topn) dat
+         rankHi = V.take topn dat
+     displayResults rankLo rankHi (correlatePeriods dat)
 
-displayResults r c = do 
-  putStrLn $ unwords ["Rankings :", show r]
+displayResults rlo rhi c = do 
+  putStrLn $ unwords ["Rankings (high):", show rhi]
+  putStrLn $ unwords ["Rankings (low):", show rlo]  
   putStrLn $ unwords ["Inter-period correlation :", show c]
 
 
@@ -65,9 +67,8 @@ sortResults v = V.modify (VA.sortBy fs) v where
   fs (_, _, c2a) (_, _, c2b) = compare (Down c2a) (Down c2b)   -- comparison function
 
 -- | Pearson correlation between the two vectors of linear trends, i.e. how well the artist trends for the first period correlates linearly with the artist trends for the second period
-correlatePeriods :: Floating b => V.Vector (a, b, b) -> b
-correlatePeriods v = pearsonR c1_ c2_ where
-  (n_, c1_, c2_) = V.unzip3 v
+
+
   
 
 

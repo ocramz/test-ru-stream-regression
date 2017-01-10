@@ -14,7 +14,7 @@ main = hspec spec
 
 spec :: Spec
 spec =
-  describe "Lib" $ do
+  describe "Numerical functions" $ do
     -- it "works" $ 
     --   True `shouldBe` True
     prop "Pearson R of a random vector with itself is ~ 1" $
@@ -28,8 +28,3 @@ instance Arbitrary (V.Vector Double) where
   arbitrary = (V.fromList <$> vector 100) `suchThat` (nonZero . V.sum)
 
 
-
--- | test data
-
-v0 :: V.Vector Double
-v0 = V.fromList [1,2,3]
