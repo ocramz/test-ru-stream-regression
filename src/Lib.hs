@@ -18,10 +18,13 @@ import Data.Ord
 
 -- * Business logic
 
+
+
 -- | Length (days) of observation periods
-obsLen, obsLen2 :: Int
+nDaysTot, obsLen, obsLen2 :: Int
+nDaysTot = 183
 obsLen = 91
-obsLen2 = 92
+obsLen2 = nDaysTot - obsLen
 
 -- | Dataset file path
 filePath :: String

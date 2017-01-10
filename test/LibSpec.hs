@@ -13,7 +13,7 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec =
+spec = do
   describe "Numerical functions" $ do
     -- it "works" $ 
     --   True `shouldBe` True
@@ -25,6 +25,10 @@ spec =
       nearZero (meanV v1) `shouldBe` True
     prop "Pearson R of a random vector (R^100) with itself is ~ 1" $
       \(x :: V.Vector Double) -> nearOne $ pearsonR x x
+  describe "Constants" $ do
+    it "Number of days == 183" $ nDaysTot `shouldBe` 183
+    it " '', first period == 91" $ obsLen `shouldBe` 91
+    it " '', second period == 92" $ obsLen2 `shouldBe` 92
 
 
 
