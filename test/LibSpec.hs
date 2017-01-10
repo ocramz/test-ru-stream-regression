@@ -27,7 +27,7 @@ spec =
 -- | Arbitrary instances for QuickCheck
 
 instance Arbitrary (V.Vector Double) where
-  arbitrary = (V.fromList <$> vector 10) `suchThat` (\x -> nonZero $ V.sum x)
+  arbitrary = (V.fromList <$> vector 100) `suchThat` (nonZero . V.sum)
 
 
 
