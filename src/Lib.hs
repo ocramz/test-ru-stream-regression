@@ -33,7 +33,7 @@ parseDataset = do
   fcontents <- B.readFile filePath
   case P.parseOnly parseRows fcontents of Left e -> error e
                                           Right x ->
-                                            return $ analyzeDataset x
+                                            return $ sortResults $ analyzeDataset x
       
 
 
@@ -44,7 +44,8 @@ analyzeDataset v = analyze <$> v  where
   analyze (Row n d1 d2) = (n, pearsonR t1_ (fi <$> d1), pearsonR t2_ (fi <$> d2))
   
 
-
+sortResults v = V.modify (VA.sortBy fs) v where
+  fs (n, _, c2a) (m, _, c2b) = compare c2a c2b   -- compare R of 2nd period 
 
 
 
