@@ -30,7 +30,7 @@ data Row = Row { artistName :: String,
 
 parseDataset = do
   fcontents <- BL.readFile filePath
-  return $ P.parse (P.many' (parseRow <* P.endOfLine) <* P.endOfInput) fcontents
+  return $ P.parse parseRows fcontents
 
 
 parseRow :: Parser B.ByteString Row
@@ -43,7 +43,8 @@ parseRow = do
 
 -- parseRows = P.many' (parseRow <* P.endOfLine) <* P.endOfInput
 
-parseRows = P.sepBy parseRow P.endOfLine <* P.endOfInput
+parseRows :: Parser B.ByteString (V.Vector Row)
+parseRows = V.fromList <$> P.sepBy parseRow P.endOfLine <* P.endOfInput
 
 
 
