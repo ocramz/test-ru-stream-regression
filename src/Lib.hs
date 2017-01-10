@@ -132,15 +132,16 @@ data Row a = Row { artistName :: String,
 -- | Parser for a single row
 parseRow :: Parser B.ByteString (Row Int)
 parseRow = do
-  n <- parseName <* spacer
-  d1 <- P.count obsLen (P.decimal <* spacer)
-  d2 <- P.sepBy P.decimal spacer
+  n <- parseName <* delim
+  d1 <- P.count obsLen (P.decimal <* delim)  -- first obsLen entries
+  d2 <- P.sepBy P.decimal delim              -- remaining entries
   return $ Row n (V.fromList d1) (V.fromList d2)
   where
-    spacer = P.char ';'
-    parseName = P.many' (P.letter_ascii <|> P.space <|> cc1 <|> cc2) where
-      cc1 = P.char '\''  -- corner cases in artists' names
-      cc2 = P.char '-'
+    delim = P.char ';'
+    parseName = P.many' (P.letter_ascii <|>
+                         P.space <|>
+                         P.char '\'' <|>
+                         P.char '-')
 
 
 -- | Parser for the whole file
