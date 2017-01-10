@@ -38,6 +38,18 @@ parseDataset = do
 
 
 
+
+
+
+
+
+-- * Utilities
+
+
+
+
+-- ** Numerics
+
 -- | Pearson linear correlation coefficient
 pearsonR :: Floating a => V.Vector a -> V.Vector a -> a
 pearsonR x y = (xm <.> ym) / (sx * sy) where
@@ -45,28 +57,8 @@ pearsonR x y = (xm <.> ym) / (sx * sy) where
   ym = centerData y
   sx = sqrt (xm <.> xm)
   sy = sqrt (ym <.> ym)
+  
 
-
-
-
--- | Utilities
-
-
--- ** Parsing-related
-parseRows :: Parser B.ByteString (V.Vector Row)
-parseRows = V.fromList <$> P.sepBy parseRow P.endOfLine <* P.endOfInput
-
-parseRow :: Parser B.ByteString Row
-parseRow = do
-  n <- P.many' P.letter_ascii <* spacer
-  d <- P.sepBy P.decimal spacer
-  return $ Row n (V.fromList d) where
-    spacer = P.char ';'
-
-
-
-
--- ** Numerics
 meanV :: Fractional a => V.Vector a -> a
 meanV v = V.sum v / fromIntegral (V.length v)
 
@@ -92,7 +84,8 @@ a <.> b = sum (V.zipWith (*) a b)
 
 
 
--- | Near zero test
+
+-- | Near-zero test, depending on numerical precision
 
 nearOne :: Epsilon e => e -> Bool
 nearOne x = nearZero (1 - x) 
@@ -111,9 +104,21 @@ instance Epsilon Double where nearZero x = x <= 1e-12
 
 
 
+-- ** Parsing-related
+parseRows :: Parser B.ByteString (V.Vector Row)
+parseRows = V.fromList <$> P.sepBy parseRow P.endOfLine <* P.endOfInput
+
+parseRow :: Parser B.ByteString Row
+parseRow = do
+  n <- P.many' P.letter_ascii <* spacer
+  d <- P.sepBy P.decimal spacer
+  return $ Row n (V.fromList d) where
+    spacer = P.char ';'
+
+    
 
 
--- testing testing
+-- | Subsets of the dataset
 
 parseTest = P.parseOnly parseRows t2
 
